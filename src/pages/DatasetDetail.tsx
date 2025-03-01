@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,22 +20,22 @@ interface Dataset {
   thumbnail_url: string | null;
   created_at: string;
   seller: {
-    first_name: string;
-    last_name: string;
+    first_name: string | null;
+    last_name: string | null;
   } | null;
   category: {
-    name: string;
+    name: string | null;
   } | null;
 }
 
 interface Review {
   id: string;
   rating: number;
-  comment: string;
+  comment: string | null;
   created_at: string;
   user: {
-    first_name: string;
-    last_name: string;
+    first_name: string | null;
+    last_name: string | null;
   } | null;
 }
 
@@ -81,7 +80,14 @@ const DatasetDetail = () => {
           });
           navigate("/datasets");
         } else {
-          setDataset(data);
+          // Ensure seller and category are properly typed
+          const typeSafeData = {
+            ...data,
+            seller: data.seller || { first_name: null, last_name: null },
+            category: data.category || { name: null }
+          } as Dataset;
+          
+          setDataset(typeSafeData);
         }
 
         // Get reviews
@@ -100,7 +106,13 @@ const DatasetDetail = () => {
         if (reviewsError) {
           console.error("Error fetching reviews:", reviewsError);
         } else {
-          setReviews(reviewsData);
+          // Ensure user is properly typed
+          const typeSafeReviews = reviewsData?.map(review => ({
+            ...review,
+            user: review.user || { first_name: null, last_name: null }
+          })) as Review[];
+          
+          setReviews(typeSafeReviews || []);
         }
 
         // Check if user has purchased this dataset
@@ -288,7 +300,7 @@ const DatasetDetail = () => {
                       <div className="flex justify-between items-start mb-2">
                         <div className="font-semibold">
                           {review.user
-                            ? `${review.user.first_name} ${review.user.last_name}`
+                            ? `${review.user.first_name || ""} ${review.user.last_name || ""}`.trim() || "Anonymous User"
                             : "Anonymous User"}
                         </div>
                         <div className="flex items-center">
@@ -317,7 +329,7 @@ const DatasetDetail = () => {
                 <div className="flex items-center text-muted-foreground">
                   <User className="h-4 w-4 mr-2" />
                   {dataset.seller
-                    ? `${dataset.seller.first_name} ${dataset.seller.last_name}`
+                    ? `${dataset.seller.first_name || ""} ${dataset.seller.last_name || ""}`.trim() || "Unknown Seller"
                     : "Unknown Seller"}
                 </div>
               </div>

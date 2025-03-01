@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DatasetGrid } from "@/components/datasets/DatasetGrid";
+import DatasetGrid from "@/components/datasets/DatasetGrid";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileUpload } from "@/components/ui/FileUpload";
 
@@ -17,11 +17,11 @@ interface Dataset {
   thumbnail_url: string | null;
   created_at: string;
   seller: {
-    first_name: string;
-    last_name: string;
+    first_name: string | null;
+    last_name: string | null;
   } | null;
   category: {
-    name: string;
+    name: string | null;
   } | null;
 }
 
@@ -71,7 +71,14 @@ const Datasets = () => {
         if (error) {
           console.error("Error fetching datasets:", error);
         } else {
-          setDatasets(data || []);
+          // Handle potential null values in nested objects
+          const typeSafeData = data?.map(item => ({
+            ...item,
+            seller: item.seller || { first_name: null, last_name: null },
+            category: item.category || { name: null }
+          })) as Dataset[];
+          
+          setDatasets(typeSafeData || []);
         }
       } catch (error) {
         console.error("Error:", error);

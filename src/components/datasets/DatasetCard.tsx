@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import ChipBadge from "../ui/ChipBadge";
 import { 
   FileSpreadsheet, 
   FileJson, 
-  FilePdf, 
+  FileText,
   HardDrive, 
   Star, 
   Clock, 
@@ -55,7 +54,7 @@ const DatasetCard = ({
     csv: <FileSpreadsheet className="h-5 w-5" />,
     excel: <FileSpreadsheet className="h-5 w-5" />,
     json: <FileJson className="h-5 w-5" />,
-    pdf: <FilePdf className="h-5 w-5" />,
+    pdf: <FileText className="h-5 w-5" />,
   };
 
   return (

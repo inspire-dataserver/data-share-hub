@@ -1,1 +1,39 @@
+
 project_id = "mxgocqawpsrfsmgskugn"
+
+[api]
+port = 54321
+schemas = ["storage", "public", "auth"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+port = 54323
+
+[inbucket]
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+[auth]
+port = 54327
+url = "http://localhost:54321"
+
+[storage]
+port = 54328
+
+[realtime]
+port = 54329
+
+[functions]
+serve_port = 54330
+file_watcher_port = 54331
+[[functions.function]]
+name = "suggest-price"
+verify_jwt = true
+path = "suggest-price"

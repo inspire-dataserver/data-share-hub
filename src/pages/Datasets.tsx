@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import DatasetGrid from "@/components/datasets/DatasetGrid";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileUpload } from "@/components/ui/FileUpload";
 
 interface Dataset {
   id: string;
@@ -21,6 +20,27 @@ interface Dataset {
     last_name: string | null;
   } | null;
   category: {
+    name: string | null;
+  } | null;
+}
+
+// Adding the required properties for DatasetCardProps
+interface DatasetCardProps {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  format: string;
+  thumbnail_url: string | null;
+  created_at: string;
+  rating?: number;
+  downloads?: number;
+  lastUpdated?: string;
+  seller?: {
+    first_name: string | null;
+    last_name: string | null;
+  } | null;
+  category?: {
     name: string | null;
   } | null;
 }
@@ -103,6 +123,14 @@ const Datasets = () => {
     return matchesSearch && matchesCategory;
   });
 
+  // Transform datasets to match DatasetCardProps
+  const datasetCards: DatasetCardProps[] = filteredDatasets.map(dataset => ({
+    ...dataset,
+    rating: 4.5, // Default rating for now
+    downloads: 100, // Default downloads for now
+    lastUpdated: new Date(dataset.created_at).toLocaleDateString(),
+  }));
+
   return (
     <div className="container py-8">
       <div className="flex flex-col gap-6">
@@ -148,7 +176,7 @@ const Datasets = () => {
             <p>Loading datasets...</p>
           </div>
         ) : (
-          <DatasetGrid datasets={filteredDatasets} />
+          <DatasetGrid datasets={datasetCards} />
         )}
       </div>
     </div>

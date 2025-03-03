@@ -54,7 +54,7 @@ const Datasets = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   useEffect(() => {
     async function fetchData() {
@@ -76,11 +76,11 @@ const Datasets = () => {
           .from("datasets")
           .select(`
             *,
-            seller:seller_id(
+            seller:profiles(
               first_name,
               last_name
             ),
-            category:category_id(
+            category:categories(
               name
             )
           `)
@@ -115,7 +115,7 @@ const Datasets = () => {
       dataset.description.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = 
-      selectedCategory === "" || 
+      selectedCategory === "all" || 
       dataset.category?.name === selectedCategory;
     
     return matchesSearch && matchesCategory;
@@ -183,7 +183,7 @@ const Datasets = () => {
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.name}>
                     {category.name}

@@ -46,13 +46,13 @@ serve(async (req) => {
 
     // Adjust based on format
     if (formatPrices && formatPrices.length > 0) {
-      const avgFormatPrice = formatPrices.reduce((sum, item) => sum + item.price, 0) / formatPrices.length;
+      const avgFormatPrice = formatPrices.reduce((sum, item) => sum + Number(item.price), 0) / formatPrices.length;
       suggestedPrice = (suggestedPrice + avgFormatPrice) / 2;
     }
 
     // Adjust based on category
     if (categoryPrices && categoryPrices.length > 0) {
-      const avgCategoryPrice = categoryPrices.reduce((sum, item) => sum + item.price, 0) / categoryPrices.length;
+      const avgCategoryPrice = categoryPrices.reduce((sum, item) => sum + Number(item.price), 0) / categoryPrices.length;
       suggestedPrice = (suggestedPrice + avgCategoryPrice) / 2;
     }
 

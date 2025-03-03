@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import PriceSuggestionHelper from "@/components/datasets/PriceSuggestionHelper";
 
 interface Category {
   id: string;
@@ -121,6 +122,10 @@ const UploadDataset = () => {
     if (e.target.files && e.target.files[0]) {
       setSample(e.target.files[0]);
     }
+  };
+
+  const handlePriceSuggested = (suggestedPrice: number) => {
+    setPrice(suggestedPrice.toString());
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -297,16 +302,27 @@ const UploadDataset = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="price">Price ($)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    min="0.01"
-                    step="0.01"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="9.99"
-                    required
-                  />
+                  <div className="space-y-2">
+                    <Input
+                      id="price"
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="9.99"
+                      required
+                    />
+                    {title && category && format && (
+                      <PriceSuggestionHelper
+                        title={title}
+                        description={description}
+                        format={format}
+                        category={category}
+                        onPriceSuggested={handlePriceSuggested}
+                      />
+                    )}
+                  </div>
                 </div>
                 
                 <div className="space-y-2">

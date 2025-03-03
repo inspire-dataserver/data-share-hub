@@ -134,8 +134,13 @@ const Datasets = () => {
     };
     
     return {
-      ...dataset,
+      id: dataset.id,
+      title: dataset.title,
+      description: dataset.description,
+      price: dataset.price,
       format: formatAsType(dataset.format),
+      thumbnail_url: dataset.thumbnail_url,
+      created_at: dataset.created_at,
       rating: 4.5, // Default rating for now
       downloads: 100, // Default downloads for now
       lastUpdated: new Date(dataset.created_at).toLocaleDateString(),

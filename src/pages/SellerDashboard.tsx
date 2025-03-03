@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,10 +5,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, LineChart } from "lucide-react";
-import { Chart } from "@/components/ui/chart";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import SalesChart from "@/components/ui/data-visualization/SalesChart";
 
 interface Dataset {
   id: string;
@@ -54,7 +53,6 @@ const SellerDashboard = () => {
           return;
         }
         
-        // Fetch seller's datasets
         const { data: datasetsData, error: datasetsError } = await supabase
           .from("datasets")
           .select(`
@@ -78,7 +76,6 @@ const SellerDashboard = () => {
           setDatasets(datasetsData || []);
         }
         
-        // Fetch purchases related to seller's datasets
         const { data: purchasesData, error: purchasesError } = await supabase
           .from("purchases")
           .select(`
@@ -100,7 +97,6 @@ const SellerDashboard = () => {
         } else {
           setPurchases(purchasesData || []);
           
-          // Calculate total revenue and sales
           const revenue = purchasesData?.reduce((sum, p) => sum + p.amount, 0) || 0;
           setTotalRevenue(revenue);
           setTotalSales(purchasesData?.length || 0);
@@ -120,7 +116,6 @@ const SellerDashboard = () => {
     fetchSellerData();
   }, [navigate, toast]);
   
-  // Prepare data for charts
   const monthlySalesData = [
     { name: 'Jan', total: 0 },
     { name: 'Feb', total: 0 },
@@ -136,7 +131,6 @@ const SellerDashboard = () => {
     { name: 'Dec', total: 0 },
   ];
   
-  // Populate chart data based on purchases
   purchases.forEach(purchase => {
     const date = new Date(purchase.created_at);
     const month = date.getMonth();
@@ -159,7 +153,6 @@ const SellerDashboard = () => {
           </div>
         ) : (
           <>
-            {/* Analytics Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -207,26 +200,12 @@ const SellerDashboard = () => {
               </Card>
             </div>
             
-            {/* Sales Chart */}
             <Card className="col-span-4">
               <CardHeader>
                 <CardTitle>Sales Overview</CardTitle>
               </CardHeader>
               <CardContent className="pl-2">
-                <Chart
-                  options={{
-                    chart: { type: 'bar', height: 350 },
-                    plotOptions: { bar: { borderRadius: 4 } },
-                  }}
-                  series={[
-                    {
-                      name: 'Revenue',
-                      data: monthlySalesData.map(d => d.total),
-                    },
-                  ]}
-                  type="bar"
-                  height={350}
-                />
+                <SalesChart data={monthlySalesData} />
               </CardContent>
             </Card>
             

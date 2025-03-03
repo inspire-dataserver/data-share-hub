@@ -124,11 +124,18 @@ const Datasets = () => {
   });
 
   // Transform datasets to match DatasetCardProps
-  const datasetCards: DatasetCardProps[] = filteredDatasets.map(dataset => ({
+  const datasetCards = filteredDatasets.map(dataset => ({
     ...dataset,
     rating: 4.5, // Default rating for now
     downloads: 100, // Default downloads for now
     lastUpdated: new Date(dataset.created_at).toLocaleDateString(),
+    // Fix the category format to match DatasetCard.tsx expectations
+    category: dataset.category?.name || "Uncategorized",
+    // Also ensure seller is properly formatted
+    seller: dataset.seller ? {
+      name: `${dataset.seller.first_name || ''} ${dataset.seller.last_name || ''}`.trim() || 'Unknown',
+      verified: true // Default to verified for now
+    } : { name: 'Unknown', verified: false }
   }));
 
   return (

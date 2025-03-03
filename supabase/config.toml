@@ -1,4 +1,7 @@
 
+# This file is for local development with Supabase CLI
+# Learn more at: https://supabase.com/docs/reference/cli/config
+
 project_id = "mxgocqawpsrfsmgskugn"
 
 [api]
@@ -28,10 +31,18 @@ enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
 enable_signup = true
 
+[storage]
+
+[realtime]
+
 [functions]
 [functions.serve]
 port = 54330
 
 [[functions.http]]
 name = "suggest-price"
+verify_jwt = true
+
+[[functions.http]]
+name = "assign-seller-role"
 verify_jwt = true

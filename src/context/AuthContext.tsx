@@ -145,29 +145,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const { error } = await supabase
+      // First, check if the user already has a seller role
+      const { data: existingRole, error: checkError } = await supabase
         .from('user_roles')
-        .insert({ user_id: user.id, role: 'seller' });
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('role', 'seller');
+
+      if (checkError) {
+        console.error("Error checking seller role:", checkError);
+        toast({
+          title: "Error",
+          description: "Could not check your current roles. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // If user already has seller role, just inform them
+      if (existingRole && existingRole.length > 0) {
+        toast({
+          title: "You're already a seller",
+          description: "Your account already has seller privileges.",
+        });
+        return;
+      }
+
+      // Use supabase serverless function to create the seller role
+      // This bypasses RLS issues by running with elevated privileges
+      const { data, error } = await supabase.functions.invoke('assign-seller-role', {
+        body: { user_id: user.id }
+      });
       
       if (error) {
-        if (error.code === '23505') {
-          toast({
-            title: "You're already a seller",
-            description: "Your account already has seller privileges.",
-          });
-        } else {
-          toast({
-            title: "Error becoming a seller",
-            description: error.message,
-            variant: "destructive",
-          });
-          console.error(error);
-        }
+        console.error("Error becoming seller:", error);
+        toast({
+          title: "Error becoming a seller",
+          description: error.message || "An unexpected error occurred.",
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Congratulations!",
           description: "You're now a seller on DataHubX.",
         });
+        
+        // Optionally refresh the session to update any claims if needed
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setSession(session);
+        }
       }
     } catch (error) {
       console.error("Error becoming seller:", error);

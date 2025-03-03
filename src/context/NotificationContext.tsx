@@ -78,7 +78,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       if (data) {
         setNotifications(data as Notification[]);
-        setUnreadCount(data.filter((n: Notification) => !n.read).length);
+        setUnreadCount(data.filter((n: any) => !n.read).length);
       }
     };
 
@@ -104,7 +104,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           toast({
             title: 'New Notification',
             description: newNotification.message,
-            icon: <Bell className="h-4 w-4" />,
           });
         }
       )

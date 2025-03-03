@@ -30,19 +30,17 @@ interface DatasetCardProps {
   title: string;
   description: string;
   price: number;
-  format: string;
+  format: "json" | "csv" | "pdf" | "excel";
   thumbnail_url: string | null;
   created_at: string;
   rating?: number;
   downloads?: number;
   lastUpdated?: string;
   seller?: {
-    first_name: string | null;
-    last_name: string | null;
-  } | null;
-  category?: {
-    name: string | null;
-  } | null;
+    name: string;
+    verified: boolean;
+  };
+  category?: string;
 }
 
 interface Category {
@@ -124,19 +122,32 @@ const Datasets = () => {
   });
 
   // Transform datasets to match DatasetCardProps
-  const datasetCards = filteredDatasets.map(dataset => ({
-    ...dataset,
-    rating: 4.5, // Default rating for now
-    downloads: 100, // Default downloads for now
-    lastUpdated: new Date(dataset.created_at).toLocaleDateString(),
-    // Fix the category format to match DatasetCard.tsx expectations
-    category: dataset.category?.name || "Uncategorized",
-    // Also ensure seller is properly formatted
-    seller: dataset.seller ? {
-      name: `${dataset.seller.first_name || ''} ${dataset.seller.last_name || ''}`.trim() || 'Unknown',
-      verified: true // Default to verified for now
-    } : { name: 'Unknown', verified: false }
-  }));
+  const datasetCards = filteredDatasets.map(dataset => {
+    // Convert format to acceptable type
+    const formatAsType = (format: string): "json" | "csv" | "pdf" | "excel" => {
+      const normalizedFormat = format.toLowerCase();
+      if (normalizedFormat === "json" || normalizedFormat === "csv" || normalizedFormat === "pdf" || normalizedFormat === "excel") {
+        return normalizedFormat as "json" | "csv" | "pdf" | "excel";
+      }
+      // Default to a safe format if it's not a recognized one
+      return "csv";
+    };
+    
+    return {
+      ...dataset,
+      format: formatAsType(dataset.format),
+      rating: 4.5, // Default rating for now
+      downloads: 100, // Default downloads for now
+      lastUpdated: new Date(dataset.created_at).toLocaleDateString(),
+      // Use category name as a string
+      category: dataset.category?.name || "Uncategorized",
+      // Also ensure seller is properly formatted
+      seller: {
+        name: `${dataset.seller?.first_name || ''} ${dataset.seller?.last_name || ''}`.trim() || 'Unknown',
+        verified: true // Default to verified for now
+      }
+    };
+  });
 
   return (
     <div className="container py-8">

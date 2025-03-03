@@ -7,7 +7,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Legend
 } from 'recharts';
 
 interface SalesChartProps {
@@ -29,14 +30,35 @@ const SalesChart: React.FC<SalesChartProps> = ({ data }) => {
           bottom: 5,
         }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
+        <CartesianGrid strokeDasharray="3 3" stroke="#f5f5f5" />
+        <XAxis 
+          dataKey="name" 
+          tick={{ fill: '#888888' }}
+          axisLine={{ stroke: '#e5e5e5' }}
+        />
+        <YAxis 
+          tick={{ fill: '#888888' }}
+          axisLine={{ stroke: '#e5e5e5' }}
+          tickFormatter={(value) => `$${value}`}
+        />
         <Tooltip 
           formatter={(value) => [`$${value}`, 'Revenue']}
           labelFormatter={(label) => `Month: ${label}`}
+          contentStyle={{ 
+            backgroundColor: 'white', 
+            border: '1px solid #e5e5e5',
+            borderRadius: '4px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
+          }}
         />
-        <Bar dataKey="total" fill="#8884d8" />
+        <Legend />
+        <Bar 
+          dataKey="total" 
+          fill="#8884d8" 
+          name="Monthly Revenue"
+          radius={[4, 4, 0, 0]}
+          barSize={30}
+        />
       </RechartsBarChart>
     </ResponsiveContainer>
   );

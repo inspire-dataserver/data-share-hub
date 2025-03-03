@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,30 +77,40 @@ const SellerDashboard = () => {
           setDatasets(datasetsData || []);
         }
         
-        const { data: purchasesData, error: purchasesError } = await supabase
-          .from("purchases")
-          .select(`
-            id,
-            amount,
-            created_at,
-            status,
-            dataset:dataset_id(title),
-            buyer:buyer_id(first_name, last_name)
-          `)
-          .in(
-            "dataset_id",
-            datasetsData?.map(d => d.id) || []
-          )
-          .order("created_at", { ascending: false });
-        
-        if (purchasesError) {
-          console.error("Error fetching purchases:", purchasesError);
-        } else {
-          setPurchases(purchasesData || []);
+        // Only fetch purchases if there are datasets
+        if (datasetsData && datasetsData.length > 0) {
+          const { data: purchasesData, error: purchasesError } = await supabase
+            .from("purchases")
+            .select(`
+              id,
+              amount,
+              created_at,
+              status,
+              dataset:dataset_id(title),
+              buyer:buyer_id(first_name, last_name)
+            `)
+            .in(
+              "dataset_id",
+              datasetsData.map(d => d.id)
+            )
+            .order("created_at", { ascending: false });
           
-          const revenue = purchasesData?.reduce((sum, p) => sum + p.amount, 0) || 0;
-          setTotalRevenue(revenue);
-          setTotalSales(purchasesData?.length || 0);
+          if (purchasesError) {
+            console.error("Error fetching purchases:", purchasesError);
+          } else {
+            // Handle potential errors or null values in the buyer field
+            const typeSafePurchases = purchasesData?.map(purchase => ({
+              ...purchase,
+              dataset: purchase.dataset || { title: "Unknown Dataset" },
+              buyer: purchase.buyer || { first_name: null, last_name: null }
+            })) as Purchase[];
+            
+            setPurchases(typeSafePurchases || []);
+            
+            const revenue = typeSafePurchases?.reduce((sum, p) => sum + p.amount, 0) || 0;
+            setTotalRevenue(revenue);
+            setTotalSales(typeSafePurchases?.length || 0);
+          }
         }
       } catch (error) {
         console.error("Error:", error);
@@ -278,7 +289,7 @@ const SellerDashboard = () => {
                             </Badge>
                           </div>
                           <CardDescription>
-                            Buyer: {purchase.buyer?.first_name} {purchase.buyer?.last_name}
+                            Buyer: {purchase.buyer ? `${purchase.buyer.first_name || ''} ${purchase.buyer.last_name || ''}`.trim() || 'Anonymous' : 'Anonymous'}
                           </CardDescription>
                         </CardHeader>
                         <CardFooter className="p-4 pt-0">
